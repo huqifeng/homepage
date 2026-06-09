@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="年轮AI官网视觉改版概念：首页高保真交互原型">
+  <title>年轮AI · 官网改版概念</title>
+  <style>
+    :root {
+      --bg: #070909;
+      --surface: #0d1110;
+      --surface-2: #121816;
+      --line: rgba(220, 241, 231, .13);
+      --text: #f2f5f1;
+      --muted: #919b96;
+      --brand: #47e6b1;
+      --brand-deep: #079c78;
+      --amber: #e8b868;
+      --max: 1240px;
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 80% 7%, rgba(31, 118, 91, .16), transparent 27%),
+        radial-gradient(circle at 15% 38%, rgba(178, 128, 50, .06), transparent 26%),
+        var(--bg);
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, a { font: inherit; }
+    a { color: inherit; text-decoration: none; }
+    button { color: inherit; }
+    .container { width: min(calc(100% - 48px), var(--max)); margin: 0 auto; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #b5c1bb;
+      font-size: 13px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 23px;
+      height: 1px;
+      background: var(--brand);
+    }
+
+    header {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 50;
+      border-bottom: 1px solid transparent;
+      transition: .25s ease;
+    }
+    header.scrolled {
+      background: rgba(7, 9, 9, .82);
+      border-color: var(--line);
+      backdrop-filter: blur(18px);
+    }
+    nav {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 19px; }
+    .brand-mark {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(71, 230, 177, .6);
+      border-radius: 50%;
+    }
+    .brand-mark::before, .brand-mark::after {
+      content: "";
+      position: absolute;
+      border: 1px solid var(--brand);
+      border-radius: 50%;
+    }
+    .brand-mark::before { inset: 6px; border-left-color: transparent; }
+    .brand-mark::after { inset: 11px; border-right-color: transparent; }
+    .nav-links { display: flex; align-items: center; gap: 32px; color: #a8b1ac; font-size: 14px; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .login { color: #b3bbb7; padding: 12px; font-size: 14px; }
+    .button {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 22px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: var(--brand);
+      color: #04100c;
+      font-weight: 650;
+      cursor: pointer;
+      transition: transform .2s, background .2s, box-shadow .2s;
+    }
+    .button:hover {
+      transform: translateY(-2px);
+      background: #67f4c5;
+      box-shadow: 0 12px 30px rgba(46, 208, 154, .18);
+    }
+    .button.secondary {
+      background: transparent;
+      color: var(--text);
+      border-color: rgba(255,255,255,.22);
+    }
+    .button.secondary:hover { border-color: rgba(255,255,255,.48); box-shadow: none; }
+    .button.small { min-height: 42px; padding: 0 18px; font-size: 14px; }
+    .arrow { font-size: 18px; }
+
+    .hero {
+      min-height: 900px;
+      padding: 162px 0 100px;
+      display: grid;
+      align-items: center;
+      overflow: hidden;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: .86fr 1.14fr;
+      gap: 54px;
+      align-items: center;
+    }
+    .hero-grid > *, .workflow-content > * { min-width: 0; }
+    h1 {
+      max-width: 610px;
+      margin: 22px 0 24px;
+      font-size: clamp(52px, 5.15vw, 78px);
+      line-height: 1.06;
+      letter-spacing: -.055em;
+      font-weight: 650;
+    }
+    h1 em {
+      display: block;
+      color: var(--brand);
+      font-style: normal;
+      font-family: "Songti SC", STSong, serif;
+      font-weight: 500;
+    }
+    .hero-copy > p {
+      max-width: 520px;
+      margin: 0;
+      color: #a4ada8;
+      font-size: 18px;
+      line-height: 1.8;
+    }
+    .hero-actions { display: flex; gap: 14px; margin-top: 36px; }
+    .hero-proof {
+      display: flex;
+      gap: 34px;
+      margin-top: 52px;
+      padding-top: 28px;
+      border-top: 1px solid var(--line);
+    }
+    .proof-item strong { display: block; font-size: 23px; font-weight: 600; }
+    .proof-item span { display: block; margin-top: 7px; color: #717a75; font-size: 12px; }
+
+    .canvas-wrap {
+      position: relative;
+      min-height: 580px;
+    }
+    .canvas-glow {
+      position: absolute;
+      inset: 14% 8%;
+      background: rgba(41, 202, 149, .17);
+      filter: blur(70px);
+      border-radius: 50%;
+    }
+    .canvas {
+      position: relative;
+      height: 550px;
+      overflow: hidden;
+      border: 1px solid rgba(194, 225, 211, .18);
+      border-radius: 28px;
+      background-color: #0b0e0e;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 32px 32px;
+      box-shadow: 0 40px 90px rgba(0,0,0,.45);
+    }
+    .canvas-top {
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(16, 21, 20, .88);
+    }
+    .canvas-title { display: flex; align-items: center; gap: 9px; color: #d3d9d6; font-size: 13px; }
+    .online-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 12px var(--brand); }
+    .canvas-tools { color: #6f7874; letter-spacing: 8px; }
+    .wire {
+      position: absolute;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(71,230,177,.2), rgba(71,230,177,.9));
+      transform-origin: left center;
+      z-index: 1;
+    }
+    .wire::after { content:""; position:absolute; right:-3px; top:-3px; width:7px; height:7px; border-radius:50%; background:var(--brand); }
+    .wire.one { width: 130px; left: 185px; top: 172px; transform: rotate(13deg); }
+    .wire.two { width: 152px; left: 192px; top: 350px; transform: rotate(-17deg); }
+    .wire.three { width: 119px; left: 380px; top: 230px; transform: rotate(-12deg); }
+    .node {
+      position: absolute;
+      z-index: 2;
+      padding: 13px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 15px;
+      background: rgba(22, 28, 26, .95);
+      box-shadow: 0 16px 35px rgba(0,0,0,.28);
+      transition: .25s ease;
+    }
+    .node:hover { border-color: rgba(71,230,177,.5); transform: translateY(-4px); }
+    .node-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: #8b9691;
+      font-size: 11px;
+    }
+    .node-icon {
+      width: 22px; height: 22px; display: grid; place-items: center;
+      border-radius: 7px; color: var(--brand); background: rgba(71,230,177,.1);
+    }
+    .node p { margin: 0; color: #dce2df; font-size: 12px; line-height: 1.55; }
+    .node.script { left: 26px; top: 102px; width: 164px; }
+    .node.character { left: 28px; top: 292px; width: 174px; }
+    .node.shot { left: 300px; top: 180px; width: 160px; }
+    .character-row { display: flex; gap: 7px; }
+    .character-face {
+      flex: 1; height: 48px; border-radius: 8px;
+      background-image: url("assets/cinematic-cases.png");
+      background-size: 310% auto;
+      background-position: 3% 50%;
+      filter: saturate(.75);
+    }
+    .character-face:nth-child(2) { background-position: 13% 50%; }
+    .character-face:nth-child(3) { background-position: 23% 50%; }
+    .result-card {
+      position: absolute;
+      z-index: 3;
+      right: 24px;
+      top: 99px;
+      width: 220px;
+      overflow: hidden;
+      border: 1px solid rgba(232,184,104,.35);
+      border-radius: 18px;
+      background: #111514;
+      box-shadow: 0 24px 55px rgba(0,0,0,.5);
+    }
+    .result-image {
+      height: 273px;
+      background-image:
+        linear-gradient(to top, rgba(3,6,5,.75), transparent 48%),
+        url("assets/cinematic-cases.png");
+      background-size: 305% auto;
+      background-position: 0% center;
+    }
+    .play {
+      position: absolute;
+      top: 116px; left: 88px;
+      width: 46px; height: 46px;
+      display: grid; place-items: center;
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: 50%;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(8px);
+    }
+    .play::after { content:""; border-left: 10px solid white; border-top: 6px solid transparent; border-bottom: 6px solid transparent; margin-left: 3px; }
+    .result-info { padding: 15px; }
+    .result-info strong { display: block; font-size: 14px; }
+    .result-info span { display: block; margin-top: 6px; color: #7d8782; font-size: 11px; }
+    .canvas-status {
+      position: absolute; left: 26px; bottom: 22px;
+      display: flex; align-items: center; gap: 8px;
+      color: #6f7a75; font-size: 11px;
+    }
+    .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); animation: pulse 1.7s infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(71,230,177,0); } 0% { box-shadow: 0 0 0 0 rgba(71,230,177,.35); } }
+
+    section { padding: 120px 0; }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 40px;
+      margin-bottom: 54px;
+    }
+    h2 {
+      max-width: 720px;
+      margin: 16px 0 0;
+      font-size: clamp(38px, 4.2vw, 58px);
+      line-height: 1.15;
+      letter-spacing: -.045em;
+      font-weight: 600;
+    }
+    .section-head p { max-width: 400px; margin: 0; color: #8f9994; line-height: 1.75; }
+
+    .workflow-shell {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(18,24,22,.9), rgba(10,13,12,.95));
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .step {
+      min-height: 96px;
+      padding: 18px;
+      border: 1px solid transparent;
+      border-radius: 16px;
+      background: rgba(255,255,255,.025);
+      color: #7d8782;
+      cursor: pointer;
+      text-align: left;
+      transition: .2s ease;
+    }
+    .step:hover, .step.active { border-color: rgba(71,230,177,.32); background: rgba(71,230,177,.07); color: var(--text); }
+    .step b { display: block; margin-bottom: 16px; color: #56605b; font-size: 11px; }
+    .step.active b { color: var(--brand); }
+    .workflow-content {
+      min-height: 350px;
+      display: grid;
+      grid-template-columns: .78fr 1.22fr;
+      overflow: hidden;
+      border-radius: 20px;
+      background: #0a0d0c;
+    }
+    .workflow-copy { display: flex; flex-direction: column; justify-content: center; padding: 52px; }
+    .workflow-copy h3 { margin: 0 0 18px; font-size: 29px; }
+    .workflow-copy p { margin: 0; color: #8e9893; line-height: 1.75; }
+    .workflow-copy ul { list-style: none; padding: 0; margin: 26px 0 0; color: #c5ccc8; font-size: 14px; }
+    .workflow-copy li { margin: 11px 0; }
+    .workflow-copy li::before { content: "✓"; margin-right: 10px; color: var(--brand); }
+    .workflow-visual {
+      position: relative;
+      min-height: 350px;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, #0a0d0c 0%, transparent 22%),
+        url("assets/cinematic-cases.png") center / cover;
+    }
+    .workflow-visual::after {
+      content: "从一句想法，到可控的完整镜头";
+      position: absolute; right: 25px; bottom: 22px;
+      padding: 11px 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 10px;
+      background: rgba(6,9,8,.72);
+      color: #cbd2ce;
+      font-size: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .cases { background: #0a0d0c; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .case-grid { display: grid; grid-template-columns: 1.35fr .65fr; gap: 18px; }
+    .case-card {
+      position: relative;
+      min-height: 530px;
+      overflow: hidden;
+      border-radius: 24px;
+      background: #111;
+    }
+    .case-card.featured {
+      background-image: linear-gradient(to top, rgba(5,7,6,.96), rgba(5,7,6,.02) 66%), url("assets/cinematic-cases.png");
+      background-size: 305% auto;
+      background-position: 0 center;
+    }
+    .case-stack { display: grid; gap: 18px; }
+    .case-card.small { min-height: 256px; }
+    .case-card.small.fantasy {
+      background-image: linear-gradient(to top, rgba(5,7,6,.92), transparent 65%), url("assets/cinematic-cases.png");
+      background-size: 305% auto;
+      background-position: 50% center;
+    }
+    .case-card.small.product {
+      background-image: linear-gradient(to top, rgba(5,7,6,.92), transparent 65%), url("assets/cinematic-cases.png");
+      background-size: 305% auto;
+      background-position: 100% center;
+    }
+    .case-meta { position: absolute; inset: auto 28px 26px; }
+    .case-meta .tag { color: var(--brand); font-size: 12px; }
+    .case-meta h3 { margin: 9px 0 7px; font-size: 25px; }
+    .case-card.small h3 { font-size: 18px; }
+    .case-meta p { margin: 0; color: #a7afab; font-size: 13px; }
+    .case-cta {
+      position: absolute;
+      right: 26px; top: 26px;
+      width: 46px; height: 46px;
+      display: grid; place-items: center;
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      background: rgba(0,0,0,.28);
+      backdrop-filter: blur(9px);
+    }
+    .featured-stats {
+      position: absolute;
+      right: 28px; bottom: 28px;
+      display: flex; gap: 8px;
+    }
+    .stat-pill { padding: 9px 12px; border-radius: 999px; background: rgba(10,14,12,.72); color: #b7c0bb; font-size: 11px; backdrop-filter: blur(10px); }
+
+    .template-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+    .template {
+      min-height: 280px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface);
+      transition: .25s ease;
+    }
+    .template:hover { transform: translateY(-5px); border-color: rgba(71,230,177,.35); background: #101613; }
+    .template-number { color: #56605b; font-size: 12px; }
+    .template-graphic {
+      position: relative;
+      height: 98px;
+      margin: 20px 0;
+    }
+    .mini-node {
+      position: absolute;
+      width: 58px; height: 35px;
+      border: 1px solid rgba(71,230,177,.32);
+      border-radius: 8px;
+      background: rgba(71,230,177,.08);
+    }
+    .mini-node:nth-child(1) { left: 4%; top: 14%; }
+    .mini-node:nth-child(2) { left: 39%; top: 54%; }
+    .mini-node:nth-child(3) { right: 4%; top: 5%; border-color: rgba(232,184,104,.44); background: rgba(232,184,104,.08); }
+    .mini-line { position: absolute; left: 55px; top: 43px; width: 120px; height: 1px; background: linear-gradient(90deg, var(--brand), var(--amber)); transform: rotate(7deg); opacity: .65; }
+    .template h3 { margin: 0 0 10px; font-size: 18px; }
+    .template p { margin: 0; color: #7d8782; font-size: 13px; line-height: 1.6; }
+
+    .final-cta { padding-top: 60px; }
+    .cta-box {
+      position: relative;
+      overflow: hidden;
+      padding: 90px 40px;
+      border: 1px solid rgba(71,230,177,.22);
+      border-radius: 30px;
+      text-align: center;
+      background:
+        radial-gradient(circle at center, rgba(38, 175, 130, .22), transparent 38%),
+        #0c1110;
+    }
+    .cta-box::before, .cta-box::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: 50%;
+      border: 1px solid rgba(71,230,177,.12);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .cta-box::before { width: 520px; height: 520px; }
+    .cta-box::after { width: 720px; height: 720px; }
+    .cta-box > * { position: relative; z-index: 1; }
+    .cta-box h2 { margin: 0 auto 18px; }
+    .cta-box p { max-width: 600px; margin: 0 auto 32px; color: #929c97; line-height: 1.7; }
+
+    footer { padding: 42px 0; border-top: 1px solid var(--line); color: #616a66; font-size: 12px; }
+    .footer-row { display: flex; justify-content: space-between; align-items: center; }
+
+    @media (max-width: 1000px) {
+      .nav-links { display: none; }
+      .hero { padding-top: 130px; }
+      .hero-grid, .workflow-content, .case-grid { grid-template-columns: 1fr; }
+      .canvas-wrap { margin-top: 20px; }
+      .section-head { align-items: start; flex-direction: column; }
+      .template-grid { grid-template-columns: repeat(2, 1fr); }
+      .case-stack { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 700px) {
+      .container { width: min(calc(100% - 28px), var(--max)); }
+      nav { height: 68px; }
+      .login { display: none; }
+      .button.small { min-height: 40px; padding: 0 13px; font-size: 13px; white-space: nowrap; }
+      .brand { gap: 9px; font-size: 17px; }
+      .brand-mark { width: 31px; height: 31px; flex: 0 0 auto; }
+      .hero { min-height: auto; padding: 120px 0 70px; }
+      h1 { font-size: 47px; }
+      .hero-copy > p { font-size: 16px; }
+      .hero-actions { align-items: stretch; flex-direction: column; }
+      .hero-proof { gap: 18px; }
+      .proof-item strong { font-size: 18px; }
+      .canvas-wrap { min-height: 430px; }
+      .canvas { height: 420px; }
+      .node.script { left: 16px; top: 78px; width: 140px; }
+      .node.character { left: 16px; top: 240px; width: 145px; }
+      .node.shot, .wire { display: none; }
+      .result-card { right: 15px; top: 105px; width: 170px; }
+      .result-image { height: 215px; }
+      .play { top: 88px; left: 65px; }
+      section { padding: 82px 0; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .workflow-copy { padding: 34px 25px; }
+      .workflow-visual { min-height: 280px; }
+      .case-stack, .template-grid { grid-template-columns: 1fr; }
+      .featured-stats { display: none; }
+      .footer-row { gap: 14px; align-items: start; flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header id="header">
+    <nav class="container" aria-label="主导航">
+      <a class="brand" href="#top" aria-label="年轮AI首页">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>年轮AI</span>
+      </a>
+      <div class="nav-links">
+        <a href="#workflow">产品</a>
+        <a href="#cases">解决方案</a>
+        <a href="#templates">工作流与模板</a>
+        <a href="#cases">作品案例</a>
+        <a href="#templates">学习中心</a>
+        <a href="#start">价格</a>
+      </div>
+      <div class="nav-actions">
+        <a class="login" href="#start">登录</a>
+        <a class="button small" href="#start">免费开始创作 <span class="arrow">↗</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">AI NARRATIVE WORKSPACE</span>
+          <h1>从一个故事，<em>到一部作品。</em></h1>
+          <p>面向短剧、动画与品牌视频的AI创作工作台。在一块画布中完成剧本、角色、分镜、生成与团队协作。</p>
+          <div class="hero-actions">
+            <a class="button" href="#start">免费开始创作 <span class="arrow">↗</span></a>
+            <a class="button secondary" href="#workflow">观看60秒产品演示 <span>▶</span></a>
+          </div>
+          <div class="hero-proof" aria-label="产品能力概览">
+            <div class="proof-item"><strong>30+</strong><span>主流生成模型</span></div>
+            <div class="proof-item"><strong>5×</strong><span>系列内容生产效率</span></div>
+            <div class="proof-item"><strong>一块画布</strong><span>统一全部创作资产</span></div>
+          </div>
+        </div>
+
+        <div class="canvas-wrap" aria-label="从剧本节点到成片的画布演示">
+          <div class="canvas-glow"></div>
+          <div class="canvas">
+            <div class="canvas-top">
+              <div class="canvas-title"><span class="online-dot"></span>《风从旷野来》创作画布</div>
+              <div class="canvas-tools" aria-hidden="true">− ○ ＋</div>
+            </div>
+            <div class="wire one"></div>
+            <div class="wire two"></div>
+            <div class="wire three"></div>
+
+            <article class="node script">
+              <div class="node-label"><span class="node-icon">文</span>故事大纲</div>
+              <p>女孩穿过金色旷野，寻找记忆中消失的故乡。</p>
+            </article>
+            <article class="node character">
+              <div class="node-label"><span class="node-icon">人</span>主体一致性</div>
+              <div class="character-row">
+                <div class="character-face"></div><div class="character-face"></div><div class="character-face"></div>
+              </div>
+            </article>
+            <article class="node shot">
+              <div class="node-label"><span class="node-icon">镜</span>智能分镜</div>
+              <p>远景 · 35mm<br>低机位跟拍 · 暖金逆光</p>
+            </article>
+
+            <article class="result-card">
+              <div class="result-image"></div>
+              <span class="play" aria-hidden="true"></span>
+              <div class="result-info">
+                <strong>最终镜头 01</strong>
+                <span>4K · 8秒 · 角色一致性 96%</span>
+              </div>
+            </article>
+            <div class="canvas-status"><span class="pulse"></span>正在生成下一镜头 · 68%</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="workflow">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">ONE CANVAS, FULL PIPELINE</span>
+            <h2>创作不再是模型的拼接，<br>而是一条完整的生产链路。</h2>
+          </div>
+          <p>让用户先理解“怎么完成一部作品”，再认识每项功能。所有角色、场景和镜头都沉淀为可复用资产。</p>
+        </div>
+
+        <div class="workflow-shell">
+          <div class="steps" role="tablist" aria-label="AI视频创作流程">
+            <button class="step active" data-step="0" role="tab"><b>01</b>灵感与大纲</button>
+            <button class="step" data-step="1" role="tab"><b>02</b>角色与场景</button>
+            <button class="step" data-step="2" role="tab"><b>03</b>智能分镜</button>
+            <button class="step" data-step="3" role="tab"><b>04</b>视频生成</button>
+            <button class="step" data-step="4" role="tab"><b>05</b>成片与协作</button>
+          </div>
+          <div class="workflow-content">
+            <div class="workflow-copy">
+              <h3 id="workflow-title">把模糊想法，变成可执行的故事</h3>
+              <p id="workflow-desc">通过对话梳理主题、人物和冲突，生成结构完整的创作大纲，并自动拆分为可继续编辑的内容节点。</p>
+              <ul id="workflow-list">
+                <li>对话式创意助手</li>
+                <li>大纲与剧本智能拆解</li>
+                <li>内容节点可追溯、可修改</li>
+              </ul>
+            </div>
+            <div class="workflow-visual" id="workflow-visual"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cases" id="cases">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">MADE WITH NIANLUN</span>
+            <h2>作品，是最直接的产品证明。</h2>
+          </div>
+          <p>案例不只展示成片，也公开使用的角色、模型与工作流，让每个优秀作品都能成为下一次创作的起点。</p>
+        </div>
+        <div class="case-grid">
+          <article class="case-card featured">
+            <a class="case-cta" href="#templates" aria-label="查看案例">↗</a>
+            <div class="case-meta">
+              <span class="tag">叙事短片 · 精选案例</span>
+              <h3>《风从旷野来》</h3>
+              <p>从故事大纲到12个连续镜头，角色与场景保持一致</p>
+            </div>
+            <div class="featured-stats">
+              <span class="stat-pill">创作耗时 2.5h</span>
+              <span class="stat-pill">12个镜头</span>
+              <span class="stat-pill">可克隆画布</span>
+            </div>
+          </article>
+          <div class="case-stack">
+            <article class="case-card small fantasy">
+              <a class="case-cta" href="#templates" aria-label="查看动画案例">↗</a>
+              <div class="case-meta">
+                <span class="tag">动画 · IP内容</span>
+                <h3>《孤城剑影》概念预告</h3>
+              </div>
+            </article>
+            <article class="case-card small product">
+              <a class="case-cta" href="#templates" aria-label="查看品牌案例">↗</a>
+              <div class="case-meta">
+                <span class="tag">品牌 · 创意TVC</span>
+                <h3>NOIR 香氛视觉短片</h3>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="templates">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">REUSABLE CREATIVE SYSTEM</span>
+            <h2>不必从空白开始，<br>从成熟工作流开始。</h2>
+          </div>
+          <p>将“插件”翻译成用户能理解的创作任务。模板明确告诉用户可以完成什么，并一键进入可编辑画布。</p>
+        </div>
+        <div class="template-grid">
+          <article class="template">
+            <span class="template-number">01 / SHORT DRAMA</span>
+            <div class="template-graphic"><i class="mini-node"></i><i class="mini-node"></i><i class="mini-node"></i><i class="mini-line"></i></div>
+            <div><h3>AI短剧一键分镜</h3><p>输入剧本，自动生成角色、景别与镜头提示。</p></div>
+          </article>
+          <article class="template">
+            <span class="template-number">02 / CHARACTER</span>
+            <div class="template-graphic"><i class="mini-node"></i><i class="mini-node"></i><i class="mini-node"></i><i class="mini-line"></i></div>
+            <div><h3>系列角色一致性</h3><p>建立主体资产，在不同镜头与项目中持续复用。</p></div>
+          </article>
+          <article class="template">
+            <span class="template-number">03 / COMMERCIAL</span>
+            <div class="template-graphic"><i class="mini-node"></i><i class="mini-node"></i><i class="mini-node"></i><i class="mini-line"></i></div>
+            <div><h3>品牌TVC快速出片</h3><p>从产品卖点生成创意脚本、视觉参考与动态镜头。</p></div>
+          </article>
+          <article class="template">
+            <span class="template-number">04 / ANIMATION</span>
+            <div class="template-graphic"><i class="mini-node"></i><i class="mini-node"></i><i class="mini-node"></i><i class="mini-line"></i></div>
+            <div><h3>动画IP概念预告</h3><p>沉淀世界观、角色与场景，快速生成系列化内容。</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta" id="start">
+      <div class="container">
+        <div class="cta-box">
+          <span class="eyebrow">YOUR STORY STARTS HERE</span>
+          <h2>让下一个故事，开始生长。</h2>
+          <p>从成熟工作流开始第一次创作，在一块画布里把灵感变成能够发布的完整作品。</p>
+          <a class="button" href="#top">免费创建我的第一块画布 <span class="arrow">↗</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-row">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>年轮AI</span></div>
+      <span>官网视觉改版概念方案 · UI / UX Design Proposal</span>
+      <span>本页面为面试方案演示</span>
+    </div>
+  </footer>
+
+  <script>
+    const workflowData = [
+      {
+        title: "把模糊想法，变成可执行的故事",
+        desc: "通过对话梳理主题、人物和冲突，生成结构完整的创作大纲，并自动拆分为可继续编辑的内容节点。",
+        list: ["对话式创意助手", "大纲与剧本智能拆解", "内容节点可追溯、可修改"],
+        position: "center"
+      },
+      {
+        title: "让角色成为能够反复使用的资产",
+        desc: "建立角色、场景与音色的主体档案，跨镜头和跨项目保持视觉一致，适合系列短剧与动画IP。",
+        list: ["角色多视角生成", "主体与音色统一管理", "跨项目资产复用"],
+        position: "15% center"
+      },
+      {
+        title: "把剧本语言翻译成镜头语言",
+        desc: "根据情绪、动作和叙事节奏建议景别、机位与运镜，并允许创作者在画布中逐镜调整。",
+        list: ["AI分镜拆解", "景别与运镜建议", "镜头连续性检查"],
+        position: "50% center"
+      },
+      {
+        title: "自由选择模型，也保持统一工作方式",
+        desc: "同一画布调用多种图像与视频模型，参数、参考素材和生成版本集中管理，不再往返多个工具。",
+        list: ["主流模型统一接入", "多版本并排对比", "生成记录自动沉淀"],
+        position: "100% center"
+      },
+      {
+        title: "从个人灵感走向团队生产",
+        desc: "在画布中完成审阅、修改与资产交付，将成熟流程保存为团队模板，持续提升下一次创作效率。",
+        list: ["团队空间与权限", "画布审阅与版本管理", "工作流发布与复用"],
+        position: "center"
+      }
+    ];
+
+    const steps = [...document.querySelectorAll(".step")];
+    const title = document.getElementById("workflow-title");
+    const desc = document.getElementById("workflow-desc");
+    const list = document.getElementById("workflow-list");
+    const visual = document.getElementById("workflow-visual");
+
+    steps.forEach((step) => {
+      step.addEventListener("click", () => {
+        const index = Number(step.dataset.step);
+        const data = workflowData[index];
+        steps.forEach((item) => item.classList.remove("active"));
+        step.classList.add("active");
+        title.textContent = data.title;
+        desc.textContent = data.desc;
+        list.innerHTML = data.list.map(item => `<li>${item}</li>`).join("");
+        visual.style.backgroundPosition = data.position;
+      });
+    });
+
+    const header = document.getElementById("header");
+    const syncHeader = () => header.classList.toggle("scrolled", window.scrollY > 20);
+    syncHeader();
+    window.addEventListener("scroll", syncHeader, { passive: true });
+  </script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!--
+ * @Author: huqifeng
+ * @Date: 2026-06-09 11:36:13
+ * @LastEditTime: 2026-06-09 11:36:14
+ * @LastEditors: huqifeng
+ * @Description: 文件注释
+-->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>年轮AI · 登录后首页改版</title>
+  <style>
+    :root {
+      --bg:#080b0b; --panel:#101414; --panel-2:#151a19; --line:#252b29;
+      --text:#f4f7f5; --muted:#8c9691; --green:#46e3b0; --green-2:#0e9f79;
+      --blue:#6ea4ff; --orange:#ff9b62; --purple:#9b86ff;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+    button,input{font:inherit} button{color:inherit} a{color:inherit;text-decoration:none}
+    svg{display:block}
+    .topbar{
+      position:fixed;inset:0 0 auto;z-index:40;height:64px;padding:0 22px 0 20px;
+      display:flex;align-items:center;justify-content:space-between;
+      border-bottom:1px solid var(--line);background:rgba(8,11,11,.92);backdrop-filter:blur(16px)
+    }
+    .brand{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700}
+    .brand-mark{position:relative;width:31px;height:31px;border:1px solid var(--green);border-radius:50%}
+    .brand-mark:before,.brand-mark:after{content:"";position:absolute;border:1px solid var(--green);border-radius:50%}
+    .brand-mark:before{inset:5px;border-left-color:transparent}.brand-mark:after{inset:10px;border-right-color:transparent}
+    .search{position:relative;width:min(34vw,460px)}
+    .search input{width:100%;height:40px;padding:0 42px;border:1px solid transparent;border-radius:12px;outline:0;background:#141918;color:var(--text)}
+    .search input:focus{border-color:rgba(70,227,176,.55);background:#171d1b}
+    .search svg{position:absolute;left:14px;top:11px;color:#75807b}
+    .account{display:flex;align-items:center;gap:17px}
+    .icon-button{width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:11px;background:transparent;cursor:pointer}
+    .icon-button:hover{background:#171c1b}
+    .credits{display:flex;align-items:center;gap:7px;color:#dce2df;font-weight:600}
+    .coin{width:19px;height:19px;border-radius:50%;background:conic-gradient(#49f3c0,#409cff,#49f3c0);box-shadow:0 0 12px rgba(70,227,176,.25)}
+    .avatar{width:34px;height:34px;border-radius:50%;border:2px solid #505956;background:linear-gradient(145deg,#cbd2cf,#737d78)}
+    .profile{display:flex;align-items:center;gap:9px;font-size:13px}
+
+    .rail{
+      position:fixed;z-index:35;left:18px;top:50%;transform:translateY(-44%);
+      width:56px;padding:7px;display:flex;flex-direction:column;gap:5px;
+      border:1px solid #343a38;border-radius:18px;background:rgba(20,24,23,.92);box-shadow:0 18px 50px rgba(0,0,0,.35)
+    }
+    .rail button{position:relative;width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:#9ca6a1;cursor:pointer}
+    .rail button:hover,.rail button.active{background:#29302e;color:white}
+    .rail button.active:after{content:"";position:absolute;left:-8px;width:3px;height:18px;border-radius:5px;background:var(--green)}
+    .tip{position:absolute;left:54px;padding:7px 9px;border-radius:7px;background:#282e2c;white-space:nowrap;opacity:0;pointer-events:none;transition:.18s}
+    .rail button:hover .tip{opacity:1}
+
+    main{width:min(calc(100% - 128px),1700px);margin:0 auto;padding:88px 0 80px}
+    .welcome{display:flex;align-items:end;justify-content:space-between;margin-bottom:18px}
+    .welcome h1{margin:0 0 4px;font-size:25px;letter-spacing:-.02em}.welcome p{margin:0;color:var(--muted)}
+    .create{min-height:43px;padding:0 18px;display:flex;align-items:center;gap:9px;border:0;border-radius:12px;background:var(--green);color:#05120d;font-weight:700;cursor:pointer}
+    .create:hover{background:#69f1c5}
+
+    .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+    .continue-card,.promo{
+      position:relative;min-height:196px;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:var(--panel)
+    }
+    .continue-card{padding:27px;background:
+      radial-gradient(circle at 76% 35%,rgba(50,198,150,.18),transparent 24%),
+      linear-gradient(125deg,#151b19,#0e1211)}
+    .continue-card:after{
+      content:"";position:absolute;right:-40px;top:-92px;width:360px;height:360px;border:1px solid rgba(70,227,176,.12);border-radius:50%;
+      box-shadow:0 0 0 55px rgba(70,227,176,.035),0 0 0 110px rgba(70,227,176,.025)
+    }
+    .continue-card .label{color:var(--green);font-size:12px}.continue-card h2{margin:12px 0 5px;font-size:27px}.continue-card p{margin:0;color:#89938e}
+    .project-row{position:absolute;z-index:2;left:27px;right:27px;bottom:25px;display:flex;align-items:center;justify-content:space-between}
+    .project-meta{display:flex;align-items:center;gap:12px}.project-cover{width:58px;height:42px;border-radius:8px;background:url("assets/community-grid.png") 0 0/400% 300%}
+    .project-meta b{display:block}.project-meta span{color:#707a75;font-size:12px}
+    .open-project{height:38px;padding:0 15px;border:1px solid #3a4541;border-radius:10px;background:#1a211f;cursor:pointer}
+    .open-project:hover{border-color:var(--green)}
+    .promo{padding:28px;background:
+      linear-gradient(90deg,rgba(3,20,31,.98),rgba(3,27,47,.73),rgba(3,20,31,.12)),
+      url("assets/community-grid.png") 67% 0/400% 300%}
+    .promo .new{display:inline-flex;padding:4px 8px;border-radius:6px;background:#25d7ec;color:#032227;font-size:11px;font-weight:800}
+    .promo h2{margin:13px 0 6px;font-size:26px}.promo p{margin:0;color:#b3c7ce}
+    .promo a{position:absolute;left:28px;bottom:25px;color:#75e7f4;font-weight:600}
+
+    .shortcuts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+    .shortcut{
+      position:relative;min-height:82px;padding:17px 18px;display:flex;align-items:center;gap:14px;
+      border:1px solid var(--line);border-radius:15px;background:#101514;cursor:pointer;overflow:hidden;transition:.2s
+    }
+    .shortcut:after{content:"";position:absolute;right:-30px;width:130px;height:130px;border-radius:50%;filter:blur(35px);opacity:.16}
+    .shortcut:nth-child(1):after{background:var(--green)}.shortcut:nth-child(2):after{background:var(--orange)}.shortcut:nth-child(3):after{background:var(--blue)}
+    .shortcut:hover{transform:translateY(-2px);border-color:#3a4441;background:#141a18}
+    .shortcut-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:#1b2421;color:var(--green)}
+    .shortcut:nth-child(2) .shortcut-icon{color:var(--orange)}.shortcut:nth-child(3) .shortcut-icon{color:var(--blue)}
+    .shortcut b{display:block;font-size:15px}.shortcut span{color:#78827d;font-size:12px}.shortcut .go{position:absolute;right:15px;color:#5d6762}
+
+    .feed-head{position:sticky;z-index:20;top:64px;margin-top:24px;padding-top:12px;background:linear-gradient(var(--bg) 78%,transparent)}
+    .feed-line{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+    .tabs{display:flex;gap:28px}.tab{position:relative;padding:14px 0;border:0;background:none;color:#8b9590;cursor:pointer}
+    .tab:hover,.tab.active{color:white}.tab.active:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:4px;background:var(--green)}
+    .sort{display:flex;align-items:center;gap:7px;color:#8b9590}
+    .chips{display:flex;gap:8px;padding:13px 0 15px;overflow:auto}.chip{padding:7px 12px;border:1px solid #272e2c;border-radius:999px;background:#111514;color:#8d9792;white-space:nowrap;cursor:pointer}
+    .chip:hover,.chip.active{border-color:#3d514a;background:#17201d;color:#dfe6e2}
+
+    .masonry{columns:5 250px;column-gap:12px}
+    .work-card{break-inside:avoid;margin:0 0 12px;overflow:hidden;border:1px solid #1e2422;border-radius:15px;background:#111514;transition:.22s}
+    .work-card:hover{transform:translateY(-3px);border-color:#3b4541;box-shadow:0 16px 35px rgba(0,0,0,.27)}
+    .art{position:relative;width:100%;background-image:url("assets/community-grid.png");background-size:400% 300%;background-repeat:no-repeat}
+    .art:after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(4,6,5,.66),transparent 42%);opacity:0;transition:.2s}
+    .work-card:hover .art:after{opacity:1}
+    .a1{height:250px;background-position:0 0}.a2{height:190px;background-position:33.333% 0}.a3{height:225px;background-position:66.666% 0}.a4{height:200px;background-position:100% 0}
+    .a5{height:185px;background-position:0 50%}.a6{height:255px;background-position:33.333% 50%}.a7{height:290px;background-position:66.666% 50%}.a8{height:210px;background-position:100% 50%}
+    .a9{height:245px;background-position:0 100%}.a10{height:195px;background-position:33.333% 100%}.a11{height:250px;background-position:66.666% 100%}.a12{height:205px;background-position:100% 100%}
+    .work-type{position:absolute;left:10px;top:10px;z-index:2;padding:4px 8px;border:1px solid rgba(255,255,255,.18);border-radius:7px;background:rgba(7,10,9,.58);backdrop-filter:blur(8px);font-size:11px}
+    .reuse{position:absolute;z-index:2;left:10px;right:10px;bottom:10px;height:36px;border:1px solid rgba(255,255,255,.22);border-radius:9px;background:rgba(8,12,10,.72);opacity:0;transform:translateY(5px);transition:.2s;cursor:pointer}
+    .work-card:hover .reuse{opacity:1;transform:none}
+    .card-info{padding:12px}.card-info h3{margin:0 0 9px;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .card-bottom{display:flex;align-items:center;justify-content:space-between;color:#77817c;font-size:12px}
+    .author{display:flex;align-items:center;gap:7px}.author i{width:22px;height:22px;border-radius:50%;background:linear-gradient(145deg,#d7c4a4,#6d5347)}
+    .metrics{display:flex;gap:9px}
+
+    .backtop{position:fixed;right:20px;bottom:20px;width:42px;height:42px;border:1px solid #343b38;border-radius:12px;background:#181d1c;cursor:pointer}
+    @media(max-width:1000px){.search{display:none}.hero-grid{grid-template-columns:1fr}.shortcuts{grid-template-columns:1fr}.masonry{columns:3 220px}}
+    @media(max-width:680px){.profile span,.credits span{display:none}.rail{display:none}main{width:calc(100% - 28px);padding-top:82px}.welcome{align-items:start;gap:15px}.welcome p{display:none}.hero-grid{display:block}.promo{margin-top:12px}.masonry{columns:2 150px}.tabs{gap:18px}.tab:nth-child(n+5){display:none}.art{height:180px!important}}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark"></span>年轮AI</a>
+    <label class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input type="search" placeholder="搜索作品、工作流、主体或创作者">
+    </label>
+    <div class="account">
+      <button class="icon-button" aria-label="通知">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+      </button>
+      <span>EN</span><div class="credits"><i class="coin"></i><span>100</span></div>
+      <div class="profile"><i class="avatar"></i><span>Nl_mhlm5f9...</span></div>
+    </div>
+  </header>
+
+  <aside class="rail" aria-label="侧边导航">
+    <button class="active" aria-label="首页"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 11 9-8 9 8v9H3z"/><path d="M9 20v-6h6v6"/></svg><span class="tip">首页</span></button>
+    <button aria-label="项目"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span class="tip">我的项目</span></button>
+    <button aria-label="画布"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg><span class="tip">创作画布</span></button>
+    <button aria-label="资产"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M6 3h12l2 4v14H4V7z"/><path d="M9 11h6"/></svg><span class="tip">资产库</span></button>
+    <button aria-label="更多"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 7h14M5 12h10M5 17h7"/></svg><span class="tip">更多</span></button>
+  </aside>
+
+  <main>
+    <section class="welcome">
+      <div><h1>上午好，继续你的创作</h1><p>回到最近项目，或从社区作品和成熟工作流中寻找灵感。</p></div>
+      <button class="create">＋ 新建创作</button>
+    </section>
+
+    <section class="hero-grid">
+      <article class="continue-card">
+        <span class="label">最近编辑 · 12分钟前</span><h2>继续创作《风从旷野来》</h2><p>已完成 8 / 12 个镜头，2个任务正在生成</p>
+        <div class="project-row">
+          <div class="project-meta"><i class="project-cover"></i><div><b>叙事短片工作流</b><span>角色、分镜、视频生成</span></div></div>
+          <button class="open-project">进入画布 →</button>
+        </div>
+      </article>
+      <article class="promo">
+        <span class="new">NEW MODEL</span><h2>Seedance 2.0 正式上线</h2><p>2K高清 · 高帧率 · 音画同步</p><a href="#">立即体验 →</a>
+      </article>
+    </section>
+
+    <section class="shortcuts" aria-label="创作市场快捷入口">
+      <article class="shortcut"><i class="shortcut-icon">插</i><div><b>插件市场</b><span>按创作任务查找专业工具</span></div><i class="go">↗</i></article>
+      <article class="shortcut"><i class="shortcut-icon">人</i><div><b>主体市场</b><span>复用稳定角色、场景与音色</span></div><i class="go">↗</i></article>
+      <article class="shortcut"><i class="shortcut-icon">流</i><div><b>工作流市场</b><span>从成熟流程直接开始创作</span></div><i class="go">↗</i></article>
+    </section>
+
+    <section class="feed-head">
+      <div class="feed-line">
+        <div class="tabs" role="tablist">
+          <button class="tab active">为你推荐</button><button class="tab">热门作品</button><button class="tab">热门剧集</button>
+          <button class="tab">精选工作流</button><button class="tab">热门主体</button><button class="tab">互动课程</button>
+        </div>
+        <button class="tab sort">综合排序⌄</button>
+      </div>
+      <div class="chips"><button class="chip active">全部</button><button class="chip">AI短剧</button><button class="chip">动画IP</button><button class="chip">品牌TVC</button><button class="chip">国风美学</button><button class="chip">角色设计</button><button class="chip">创意实验</button></div>
+    </section>
+
+    <section class="masonry" id="feed">
+      <article class="work-card"><div class="art a1"><span class="work-type">视频作品</span><button class="reuse">查看创作过程</button></div><div class="card-info"><h3>鱼灯记 · 东方奇幻概念短片</h3><div class="card-bottom"><span class="author"><i></i>山海造梦局</span><span class="metrics">♡ 2.8k　◉ 326</span></div></div></article>
+      <article class="work-card"><div class="art a5"><span class="work-type">商业案例</span><button class="reuse">使用同款工作流</button></div><div class="card-info"><h3>宠物品牌春日整合创意</h3><div class="card-bottom"><span class="author"><i></i>椰子设计</span><span class="metrics">♡ 864　◉ 95</span></div></div></article>
+      <article class="work-card"><div class="art a9"><span class="work-type">主体</span><button class="reuse">获取主体</button></div><div class="card-info"><h3>西幻王子 · 全身角色设定</h3><div class="card-bottom"><span class="author"><i></i>光屿Studio</span><span class="metrics">♡ 1.2k　◉ 188</span></div></div></article>
+      <article class="work-card"><div class="art a2"><span class="work-type">图片作品</span><button class="reuse">查看生成参数</button></div><div class="card-info"><h3>窗边的三花猫</h3><div class="card-bottom"><span class="author"><i></i>是YY呀</span><span class="metrics">♡ 935　◉ 72</span></div></div></article>
+      <article class="work-card"><div class="art a6"><span class="work-type">图片作品</span><button class="reuse">查看创作过程</button></div><div class="card-info"><h3>三千问 · 樱花水墨实验</h3><div class="card-bottom"><span class="author"><i></i>三千问Atelier</span><span class="metrics">♡ 756　◉ 68</span></div></div></article>
+      <article class="work-card"><div class="art a10"><span class="work-type">视频作品</span><button class="reuse">克隆画布</button></div><div class="card-info"><h3>天光破晓 · 氛围概念片</h3><div class="card-bottom"><span class="author"><i></i>SHEYE</span><span class="metrics">♡ 1.8k　◉ 214</span></div></div></article>
+      <article class="work-card"><div class="art a3"><span class="work-type">品牌TVC</span><button class="reuse">使用同款工作流</button></div><div class="card-info"><h3>修仙必备，日行千里</h3><div class="card-bottom"><span class="author"><i></i>迈克AIGC</span><span class="metrics">♡ 683　◉ 41</span></div></div></article>
+      <article class="work-card"><div class="art a7"><span class="work-type">剧集预告</span><button class="reuse">查看完整画布</button></div><div class="card-info"><h3>《楚星河》角色概念预告</h3><div class="card-bottom"><span class="author"><i></i>长安铺子</span><span class="metrics">♡ 3.4k　◉ 479</span></div></div></article>
+      <article class="work-card"><div class="art a11"><span class="work-type">视频作品</span><button class="reuse">查看运镜提示</button></div><div class="card-info"><h3>时间留下的脸</h3><div class="card-bottom"><span class="author"><i></i>像素叙事</span><span class="metrics">♡ 2.1k　◉ 302</span></div></div></article>
+      <article class="work-card"><div class="art a4"><span class="work-type">主体包</span><button class="reuse">获取整套主体</button></div><div class="card-info"><h3>十二色幻想角色企划</h3><div class="card-bottom"><span class="author"><i></i>那边的蛋仔</span><span class="metrics">♡ 1.5k　◉ 159</span></div></div></article>
+      <article class="work-card"><div class="art a8"><span class="work-type">工作流</span><button class="reuse">克隆分镜工作流</button></div><div class="card-info"><h3>悬疑短片自动分镜模板</h3><div class="card-bottom"><span class="author"><i></i>黑镜工作室</span><span class="metrics">♡ 996　◉ 132</span></div></div></article>
+      <article class="work-card"><div class="art a12"><span class="work-type">商业案例</span><button class="reuse">使用同款工作流</button></div><div class="card-info"><h3>NOIR 香氛视觉短片</h3><div class="card-bottom"><span class="author"><i></i>边界创意</span><span class="metrics">♡ 722　◉ 83</span></div></div></article>
+    </section>
+  </main>
+
+  <button class="backtop" aria-label="返回顶部" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+  <script>
+    document.querySelectorAll(".tab").forEach(tab=>tab.addEventListener("click",()=>{
+      if(tab.classList.contains("sort")) return;
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); tab.classList.add("active");
+    }));
+    document.querySelectorAll(".chip").forEach(chip=>chip.addEventListener("click",()=>{
+      document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active")); chip.classList.add("active");
+    }));
+  </script>
+</body>
+</html>
